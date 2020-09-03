@@ -18,7 +18,7 @@ main:
     
     jal RegRA                       # Coletar RAs
 
-    ## Lembrar de ordenar o vetor de RAs
+    jal bbSort                      #ordena o vetor de RA's
 
     loopmenu:
         li $v0, 4
@@ -155,7 +155,47 @@ ExibAprov:
     lw $ra, 0($sp)                  # desempilha o registrador de retorno
     addi $sp, $sp, 4
     jr $ra
+#-------------------------------------------------------------------------------------
+bbSort:
+    addi $sp, $sp, -4
+    sw $ra, 0($sp)
 
+    lb $t0, sizevetRA	 		    #caregga o tamanho em t0
+    rot1:
+        beq $t0, $zero, saida
+        add $t1, $zero, $zero 		#j
+    rot2:
+        blt $t0, $t1, sair1
+
+        lw $t3,vetorRA($t1) 		#Carregando a posicao i do vetor em t3
+
+        addi $t1, $t1, 4
+        lw $t4, vetorRA($t1)
+        addi $t1, $t1, -4 
+
+        blt $t3, $t4, sair2 		#Se o proximo for maior ele nao troca
+        move $a0, $t1
+        jal swap
+
+        sair2:									 
+            addi $t1, $t1, 4		#Decrementa j(t1)
+            j rot2 
+    sair1: 
+        addi $t0, $t0, -4			#Decrementa o i(t0)
+        j rot1
+    saida: 
+    lw $ra, 0($sp)
+    addi $sp, $sp, 4
+    jr $ra
+#-------------------------------------------------------------------------------------
+swap: 
+    add $t7, $a0, 4                  #(address of v[k])
+    lw $t2, vetorRA($t7)             #$t2 (temp) = v[k]
+    lw $t6, vetorRA($a0)             #$t6 = v[k+1]
+    sw $t6, vetorRA($t7)             #v[k] = t6 (v[k+1])
+    sw $t2, vetorRA($a0)             #v[k+1] = t2 (temp)
+    jr $ra					
+#-------------------------------------------------------------------------------------
 ######################################################################################
 # RASCUNHO
     addi $sp, $sp, -4               # Empilha o registrador de retorno
@@ -165,3 +205,4 @@ ExibAprov:
     lw $ra, 0($sp)                  # desempilha o registrador de retorno
     addi $sp, $sp, 4
     jr $ra
+
