@@ -291,29 +291,34 @@ Calcular:
 	# Peso 2 para as atividades
 
     fimAtiv:
-	div.s $f2, $f2, $f6				# Calcula a média
+        div.s $f2, $f2, $f6				# Calcula a média
 
-	addi $s3, $s3, -32				# Subtrai o índice da linha para chegar na posição da média
+        mtc1 $zero, $f12
+        #Arredondamento
+        #div.s $f12 $f12, $f4 			# Divide a média / 0.5
+        #mfhi $f6 
+        
+        #rem $f12, $f2, $f4
+        div.s $f12, $f4
+        mfhi $f12
 
-	add $t1, $s3, $a1				# Soma o endereço para chegar a posição correta na memória
-	mtc1 $zero, $f12
-	#Arredondamento
-	div $f12, $f4 				# Divide a média / 0.5
-	#mfhi $f6 
-	li $v0, 2
-	syscall
-	c.bl.s $f12, $f7			# Verifica se é menor que 0,25 para arredondar para baixo
-	bc1t baixo
+        li $v0, 2
+        syscall
 
-	sub.s $f2, $f2, $f12			# media = media - resto
-	add.s $f2, $f2, $f4				# media = media + 0.5
-	j salvar
+        c.lt.s $f12, $f7			    # Verifica se é menor que 0,25 para arredondar para baixo
+        bc1t baixo
+
+        sub.s $f2, $f2, $f12			# media = media - resto
+        add.s $f2, $f2, $f4				# media = media + 0.5
+        j salvar
 
 	baixo:
-	sub.s $f2, $f2, $f12			# media = media - resto
+    	sub.s $f2, $f2, $f12			# media = media - resto
 
 	salvar:
-	s.s $f2, 0($t1)					# Salva a média na memória
+        addi $s3, $s3, -32				# Subtrai o índice da linha para chegar na posição da média
+        add $t1, $s3, $a1				# Soma o endereço para chegar a posição correta na memória
+	    s.s $f2, 0($t1)					# Salva a média na memória
 
 	lw $ra, 0($sp)                  # Desempilha o registrador de retorno
 	addi $sp, $sp, 4
