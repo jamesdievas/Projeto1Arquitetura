@@ -149,26 +149,26 @@ Cadastrar:
     sw $ra, 0($sp)
 
     la $a1, matriz					# Coleta o endereço base da matriz  
-    addi $s1, $zero, 4                  #inicializa o j=4
+    addi $s1, $zero, 4              # Inicializa o j=4
 
     Le:
-        add $s2, $zero, $zero        #i
+        add $s2, $zero, $zero       # i
 
         Ler1:
             add $t1, $s2, $s1 		# i+j
-            add $t1, $t1, $a1       #i+j+base
-            #add
-            li $v0, 6                #lê float da tela e guarda em f0
+            add $t1, $t1, $a1       # i+j+base
+            
+            li $v0, 6               # Lê float da tela e guarda em f0
             syscall
-            s.s $f0, 0($t1)		    #guarda o valor lido na tela
+            s.s $f0, 0($t1)		    # Guarda o valor lido na tela
 
             addi $s2, $s2, 32
-            blt $s2, 160 , Ler1      #ver se ja deu notas da mesma prova para todos
+            blt $s2, 160 , Ler1     # Ver se ja deu notas da mesma prova para todos
 
             li $v0, 4
             la $a0, msg
             syscall
-            addi $s1, $s1, 4             #indece j+=4
+            addi $s1, $s1, 4        # Índice j+=4
     
             blt $s1, 32, Le
 
@@ -325,10 +325,10 @@ Calcular:
     addi $sp, $sp, -4               # Empilha o registrador de retorno
     sw $ra, 0($sp)
 
-	lwc1 $f4, const05($gp)			# li.s $f4, 0.5
-	lwc1 $f5, const02($gp)			# li.s $f5, 0.2
-	lwc1 $f6, const20($gp)			# li.s $f6, 20.0
-	lwc1 $f7, const025($gp)			# li.s $f7, 0.25
+	l.s $f4, const05					#lwc1 $f4, const05			
+	l.s $f5, const02					#lwc1 $f5, const02
+	l.s $f6, const20					#lwc1 $f6, const20			
+	l.s $f7, const025 					#lwc1 $f7, const025
 
 	addi $s3, $s1, 32				# s3 guardará o final de cada linha da matriz
 
@@ -360,7 +360,7 @@ Calcular:
 
 		add $t1, $s2, $a1			# Adiciona o valor do endereço da matriz
 		l.s $f1, 0($t1)				# Acessa o valor na matriz
-
+		
 		mul.s $f3, $f1, $f5			# Multiplica a nota pelo seu respectivo peso
 
 		add.s $f2, $f2, $f3			# Media += Ax (x = nº da atividade)
