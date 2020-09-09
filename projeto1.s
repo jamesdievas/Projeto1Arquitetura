@@ -3,21 +3,21 @@
 .data
     RAs:    .asciiz "\nInsira o RA do aluno "
     pontos: .asciiz ": "
-    menu:   .asciiz "\n0 - Encerrar programa.\n1 - Cadastrar notas.\n2 - Alterar nota.\n3 - Exibir notas.\n4 - media aritmetica da turma.\n5 - Aprovados.\n-> "
-	notasRA: .asciiz "\nNotas do RA "
+    menu:   .asciiz "\n0 - Encerrar programa.\n1 - Cadastrar notas.\n2 - Alterar nota.\n3 - Exibir notas.\n4 - Media aritmetica da turma.\n5 - Aprovados.\n-> "
 	msgmedsala: .asciiz "\nMedia da sala: "
     space: .asciiz " "
 	msg: .asciiz  "\n"
+	msg1: .asciiz "\t"
+	tabela: .asciiz " RAs\tMedia\tP1\tP2\tAT1\tAT2\tAT3\tAT4\tAT5"
     vetorRA:  .word 0, 0, 0, 0, 0
     sizevetRA: .byte 20
     matriz: .float 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
     #sizemat: .word 160
 	mediasala: .float 0
-    const02: .float 0.2
-	const05: .float 0.5
+    const2: .float 2.0
+	const5: .float 5.0
 	const20: .float 20.0
 	const025: .float 0.25
-	const5: .float 5.0
 	const0: .float 0.0
 .text
 .globl main
@@ -40,7 +40,7 @@ main:
         syscall
 
         beq	$v0, 1, cadastronota    # Cadastrar notas
-        beq $v0, 2, altnota         # Excluir nota
+        beq $v0, 2, altnota         # Alterar nota
         beq	$v0, 3, nota       		# Exibir notas
         beq $v0, 4, media           # Exibir media da sala
         beq $v0, 5, aprovados       # Exibir aprovados
@@ -143,7 +143,7 @@ Exibir:
 	jr $ra
 
 #--------------------------------------------------------------------
-# Função que cadastra as notas
+# Função que cadastra as notas VER SE FUNCIONA
 Cadastrar:
     addi $sp, $sp, -4               # Empilha o registrador de retorno
     sw $ra, 0($sp)
@@ -165,9 +165,8 @@ Cadastrar:
             addi $s2, $s2, 32
             blt $s2, 160 , Ler1     # Ver se ja deu notas da mesma prova para todos
 
-            li $v0, 4
-            la $a0, msg
-            syscall
+            jal Pularlinha
+
             addi $s1, $s1, 4        # Índice j+=4
     
             blt $s1, 32, Le
@@ -177,7 +176,7 @@ Cadastrar:
     jr $ra
 
 #------------------------------------------------------------------------------------
-# Função que altera uma nota de um aluno
+# Função que altera uma nota de um aluno #####################
 Alterar:
     addi $sp, $sp, -4               # Empilha o registrador de retorno
     sw $ra, 0($sp)
@@ -188,49 +187,65 @@ Alterar:
     jr $ra
 
 #------------------------------------------------------------------------------------
-# Função que exibe todas as notas dos alunos cadastrados
+# Função que exibe todas as notas dos alunos cadastrados 
 Exibnotas:
 	addi $sp, $sp, -4				# Empilha o endereço de retorno da main
 	sw $ra, 0($sp)
 
-    move $s0, $zero
-    li $s1, 0        				# Manipulação do vetor
-    li $s2, 0        				# Manipulação da matriz
+    li $s0, 0						# Manipulação do vetor
+    li $s1, 0        				# Manipulação da matriz (i)
+    li $s2, 0        				# Manipulação da matriz (j)
     la $a1, matriz  				# Endereço da matriz  de notas na memória
     la $a2, vetorRA   				# Endereço do vetor de RA na memória
 
+	li $v0, 4						# Imprime cabeçalho da tabela
+	la $a0, tabela
+	syscall
+
+	jal Pularlinha
+
     exibirpontos:
-        beq $t0, 160, sairmenu 			# Checa se chegou no final da matriz
+        add $t0, $s0, $a2 			# Coleta o RA do aluno
+        lw $t1, 0($t0)
 
-        li $v0, 4
-        la $a0, notasRA 			# Imprime a msg de média XXXXXXXXXXXXXXX
+		li $v0, 4           		# Imprime espaço
+        la $a0, space
         syscall
-
-        add $t1, $s1, $a2 			# Coleta o RA do aluno
-        lw $t2, 0($t1)
 
         li $v0, 1            		# Imprime o RA do aluno
-        move $a0, $t2
+        move $a0, $t1
         syscall
 
-        li $v0, 4           		# Imprime os dois pontos
-        la $a0, pontos
+        li $v0, 4           		# Imprime tab
+        la $a0, msg1
         syscall
 
 		#### IMPRIMIR AS NOTAS E DPS A MÉDIA
-
-        add $t0, $a1, $s2     		# Atualiza para chegar na posição correta da memória
+	printnota:
+		add $t2, $s1, $s2			# i + j
+        add $t2, $a1, $t2     		# Atualiza para chegar na posição correta da memória
 
         li $v0, 2
-        l.s $f12, 0($t0)    		# Coleta a media da memória e imprime
+        l.s $f12, 0($t2)    		# Coleta a nota da memória e imprime
         syscall
 
-        li $v0, 4            		# Pula linha
-        la $a0, msg
+        li $v0, 4            		# Imprime tab
+        la $a0, msg1
         syscall
 
-        addi $s1, $s1, 1    		# Atualiza o valor da posição no vetor
-        addi $s2, $s2, 32    		# Atualiza o valor da linha na matriz
+		addi $s2, $s2, 4			# Atualiza j (j+=4) para a próxima coluna
+		beq $s2, 32, novalinha		# Confere se terminou a linha
+		j printnota
+
+	novalinha:
+
+		jal Pularlinha				
+
+        addi $s0, $s0, 4    		# Atualiza o valor da posição no vetor
+		li $s2, 0					# Zera j para começar na primeira coluna
+        addi $s1, $s1, 32    		# Atualiza o valor da linha na matriz
+		beq $s1, 160, sairmenu 		# Checa se chegou no final da matriz
+
         j exibirpontos
 
     sairmenu:
@@ -252,19 +267,18 @@ Exibirmed:
 	l.s $f12, mediasala
 	syscall
 
-	li $v0, 4						# Pula linha
-	la $a0, msg
-	syscall
+	jal Pularlinha
 
 	lw $ra, 0($sp)					# Desempilha o endereço de retorno para a main
 	addi $sp, $sp, 4
 	jr $ra
     
 #-------------------------------------------------------------------------------------
-# Função que exibe os alunos aprovados
+# Função que exibe os alunos aprovados #####################
 ExibAprov:
     addi $sp, $sp, -4               # Empilha o registrador de retorno
     sw $ra, 0($sp)
+
 
     
     lw $ra, 0($sp)                  # Desempilha o registrador de retorno
@@ -325,10 +339,10 @@ Calcular:
     addi $sp, $sp, -4               # Empilha o registrador de retorno
     sw $ra, 0($sp)
 
-	l.s $f4, const05					#lwc1 $f4, const05			
-	l.s $f5, const02					#lwc1 $f5, const02
-	l.s $f6, const20					#lwc1 $f6, const20			
-	l.s $f7, const025 					#lwc1 $f7, const025
+	l.s $f4, const5					#lwc1 $f4, const05			
+	l.s $f5, const2					#lwc1 $f5, const02
+	l.s $f6, const20				#lwc1 $f6, const20			
+	l.s $f7, const025 				#lwc1 $f7, const025
 
 	addi $s3, $s1, 32				# s3 guardará o final de cada linha da matriz
 
@@ -379,30 +393,30 @@ Calcular:
         #mfhi $f6 
 
         loopver:
-        addi $t4, $t4, 1
-        c.lt.s $f9,$f2              # c.lt.s (uma especie de um if)
+        	addi $t4, $t4, 1
+        	c.lt.s $f2,$f9              # c.lt.s (uma especie de um if)
                                 	# f2=4.30 f9=4.5
-        bc1t  lresto            
-        add.s $f9, $f9, $f7
-        j loopver
+        	bc1t  lresto            
+        	add.s $f9, $f9, $f7
+        	j loopver
 
         lresto:
-        rem $t4, $t4, 2             # A divisao por 2, nos permite ver se o contador eh par/impar
-        bne $t4, 1, par         
+        	rem $t4, $t4, 2             # A divisao por 2, nos permite ver se o contador eh par/impar
+        	bne $t4, 1, par         
 
 		#sub.s $f9, $f9, $f7 #caso não estiver certo tentar esse
-        sub.s $f9, $f9, $f2         # Quando impar, madia = f9-0,25 (arredonda para baixo)
-        add.s $f2, $f2, $f9 ##### VER SE ESTA CERTO ESTA PARTE
+        	sub.s $f9, $f9, $f2         # Quando impar, madia = f9-0,25 (arredonda para baixo)
+        	add.s $f2, $f2, $f9 ##### VER SE ESTA CERTO ESTA PARTE
 
-        j fcomp
+        	j fcomp
 
         par:                        # Quando for par, salva media = f9 (arredonda para cima)
-        mov.s $f2,$f9               
+        	mov.s $f2,$f9               
 
         fcomp:
-        mov.s $f12,$f2
-        li $v0, 2   #---lembrar de fazer teste para ver se pega certo
-        syscall
+        #mov.s $f12,$f2
+        #li $v0, 2   #---lembrar de fazer teste para ver se pega certo
+        #syscall
 
         addi $s3, $s3, -32			# Subtrai o índice da linha para chegar na posição da média
         add $t1, $s3, $a1			# Soma o endereço para chegar a posição correta na memória
@@ -418,20 +432,19 @@ Medsala:
     addi $sp, $sp, -4               # Empilha o registrador de retorno
     sw $ra, 0($sp)
 
-    #move $s0, $zero
-    li $s1, 0        				# Manipulação do vetor
+    move $s0, $zero
+    #li $s1, 0        				# Manipulação do vetor
     la $a1, matriz  				# Endereço da matriz  de notas na memória
 	l.s $f8, const0
 
     somamed:
-        beq $t0, 160, sair 			# Checa se chegou no final da matriz
-
 		add $t0, $a1, $s2     		# Atualiza para chegar na posição correta da memória
 		l.s $f0, 0($t0)				# Carrega a média de uma aluno
 
 		add.s $f8, $f8, $f0			# Soma médias += média de um aluno
 
         addi $s2, $s2, 32    		# Atualiza o valor da linha na matriz
+		beq $s2, 160, sair 			# Checa se chegou no final da matriz
         j somamed
 
     sair:
@@ -444,6 +457,17 @@ Medsala:
     	jr $ra
 
 #-------------------------------------------------------------------------------------
+Pularlinha:
+	addi $sp, $sp, -4               # Empilha o registrador de retorno
+    sw $ra, 0($sp)
+
+	li $v0, 4            			# Imprime nova linha
+    la $a0, msg
+    syscall
+    
+    lw $ra, 0($sp)                  # desempilha o registrador de retorno
+    addi $sp, $sp, 4
+    jr $ra
 ######################################################################################
 # RASCUNHO
     addi $sp, $sp, -4               # Empilha o registrador de retorno
