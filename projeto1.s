@@ -2,8 +2,6 @@
 #J. Dievas J. Manhiça Ra:19076272
 
 # Função alterar nota
-# Acrescentar strings na leitura de notas
-
 
 .data
     RAs:    .asciiz "\nInsira o RA do aluno "
@@ -14,11 +12,16 @@
     space: .asciiz " "
 	msg: .asciiz  "\n"
 	msg1: .asciiz "\t"
+	buscaRA: .asciiz "\nInsira o RA do aluno em questao: "
 	tabela: .asciiz " RAs\tMedia\tP1\tP2\tAT1\tAT2\tAT3\tAT4\tAT5"
     passou: .asciiz "\n RA aprovado: "
     msgproj: .asciiz "\n Notas projeto "
     msgativ: .asciiz "\n Notas atividade "
     erro: .asciiz "\nIntroduza um valor valido: "
+	erroRA: .asciiz "\nRA incorreto, insira um cadastrado no sistema: "
+	avs: .asciiz "\n Qual avaliacao deseja alterar?\n 1 - Projeto 1.\n 2 - Projeto 2.\n 3 - Atividade 1.\n 4 - Atividade 2.\n 5 - Atividade 3.\n 6 - Atividade 4.\n 7 - Atividade 5.\n-> "
+	alteracao: .asciiz "\n Insira a nota: "
+	testar: .asciiz "\nTESTE"
     vetorRA:  .word 0, 0, 0, 0, 0
     sizevetRA: .byte 20
     matriz: .float 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
@@ -37,7 +40,7 @@ main:
     
     jal RegRA                       # Coletar RAs
 
-    #jal Exibir						# Exibe o vetor,TESTE
+    #jal Exibir						# Exibe o vetor TESTE
 
     jal Sort	                    # Ordena o vetor de RA's
 
@@ -45,7 +48,7 @@ main:
     la $a0, RAsord
     syscall
 
-    jal Exibir						# Exibe o vetor,TESTE
+    jal Exibir						# Exibe o vetor TESTE
 
     loopmenu:
         li $v0, 4					# Imprime a mensagem de menu
@@ -242,13 +245,88 @@ Alterar:
     sw $ra, 0($sp)
 
     # Coletar RA (verificar se existe), a prova (1-7, verificar se está no intervalo) e a nota a ser alterada (verificar se está no intervalo 0-10)
+	li $v0, 4						# Imprime a mensagem para coletar o RA
+	la $a0, buscaRA
+	syscall
 
+	jal BuscarRA					# Função que coleta e verifica se o RA existe e salva a linha do respectivo aluno em s1
+
+	menunota:
+		li $v0, 4					# Imprime a mensagem para exibir o menu de avaliações
+		la $a0, avs
+		syscall
+
+		li $v0, 5					# Coleta a opção do usuário
+		syscall
+
+		blt $v0, $zero, menunota
+		bgt $v0, 7, menunota
+
+		sll $s2, $v0, 2				# Multiplica por 4 para chegar na coluna correta
+
+		li $v0, 4					# Imprime a mensagem para coletar a nova nota
+		la $a0, alteracao
+		syscall
+
+		li $v0, 6					# Coleta a nova nota
+		syscall
+
+		jal Verintervalo			# Verifica se a nota está entre 0 a 10
+
+		la $a2, matriz				# Carrega o endereço da matriz
+
+		add $t1, $a2, $s1			# Soma a linha ao endereço 
+		add $t1, $t1, $s2			# Soma com a coluna para chegar na correta posição na matriz
+		s.s $f0, 0($t1)				# Alteração do valor na matriz
     
     lw $ra, 0($sp)                  # Desempilha o registrador de retorno
     addi $sp, $sp, 4
     jr $ra
-
 #------------------------------------------------------------------------------------
+# Função que coleta e verifica se o RA existe
+BuscarRA:
+	addi $sp, $sp, -4               # Empilha o registrador de retorno
+    sw $ra, 0($sp)
+
+	j leituraRA
+
+	novamente:
+		li $v0, 4					# Imprime a mensagem de erro + inserir um novo RA
+		la $a0, erroRA
+		syscall
+
+	leituraRA:
+		li $v0, 5					# Coleta o RA
+		syscall
+
+		la $a1, vetorRA				# Recebe o endereço do vetor na memória
+		move $t0, $zero				# Índice do vetor
+
+	percorre:
+		beq $t0, 20, novamente		# Verifica se chegou no final do vetor
+
+		sll $t2, $t0, 2				# Multiplica por 4 para chegar na posição correta do vetor
+		add $t1, $t2, $a1			# Chega na posição correta do vetor na memória
+	
+		lw $t2, 0($t1)				# Coleta o valor do RA
+
+		beq	$v0, $t2, found			# Verifica se o RA existe
+
+		addi $t0, $t0, 1			# Incrementa a posição do vetor
+		j percorre
+
+	found:
+		#li $v0, 4					# Imprime a mensagem de erro + inserir um novo RA
+		#la $a0, testar
+		#syscall
+		mul $s1, $t1, 32			# Multiplica por 32 para chegar na linha correta da matriz
+		#TESTAR:
+		#sll $s1, $t1, 5
+
+
+	lw $ra, 0($sp)                  # Desempilha o registrador de retorno
+    addi $sp, $sp, 4
+    jr $ra
 # Função que exibe todas as notas dos alunos cadastrados 
 Exibnotas:
 	addi $sp, $sp, -4				# Empilha o endereço de retorno da main
