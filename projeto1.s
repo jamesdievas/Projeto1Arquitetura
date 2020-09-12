@@ -1,43 +1,40 @@
 #Henrique Sartori Siqueira Ra:19240472
-#J. Dievas J. Manhiça Ra:19076272
-
-# Função alterar nota
-
+#Jemis Dievas José Manhiça Ra:19076272
 .data
-    RAs:    .asciiz "\nInsira o RA do aluno "
-    pontos: .asciiz ": "
-    menu:   .asciiz "\n0 - Encerrar programa.\n1 - Cadastrar notas.\n2 - Alterar nota.\n3 - Exibir notas.\n4 - Media aritmetica da turma.\n5 - Aprovados.\n-> "
-	msgmedsala: .asciiz "\nMedia da sala: "
-    RAsord: .asciiz "\nRAs ordenados:\n"
-    space: .asciiz " "
-	msg: .asciiz  "\n"
-	msg1: .asciiz "\t"
-	buscaRA: .asciiz "\nInsira o RA do aluno em questao: "
-	tabela: .asciiz " RAs\tMedia\tP1\tP2\tAT1\tAT2\tAT3\tAT4\tAT5"
-    passou: .asciiz "\n RA aprovado: "
-    msgproj: .asciiz "\n Notas projeto "
-    msgativ: .asciiz "\n Notas atividade "
-    erro: .asciiz "\nIntroduza um valor valido: "
-	erroRA: .asciiz "\nRA incorreto, insira um cadastrado no sistema: "
-	avs: .asciiz "\n Qual avaliacao deseja alterar?\n 1 - Projeto 1.\n 2 - Projeto 2.\n 3 - Atividade 1.\n 4 - Atividade 2.\n 5 - Atividade 3.\n 6 - Atividade 4.\n 7 - Atividade 5.\n-> "
-	alteracao: .asciiz "\n Insira a nota: "
-	testar: .asciiz "\nTESTE"
-    vetorRA:  .word 0, 0, 0, 0, 0
-    sizevetRA: .byte 20
-    matriz: .float 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-    #sizemat: .word 160
-	mediasala: .float 0
-    const10: .float 10.0
-    const2: .float 2.0
-	const5: .float 5.0
-    const05: .float 0.5
-	const20: .float 20.0
-	const025: .float 0.25
-	const0: .float 0.0
+    RAs:        .asciiz "\n Insira o RA do aluno "
+    pontos:     .asciiz ": "
+    menu:       .asciiz "\n 0 - Encerrar programa.\n1 - Cadastrar notas.\n2 - Alterar nota.\n3 - Exibir notas.\n4 - Media aritmetica da turma.\n5 - Aprovados.\n-> "
+	msgmedsala: .asciiz "\n Media da sala: "
+    RAsord:     .asciiz "\n RAs ordenados:\n"
+    space:      .asciiz " "
+	msg:        .asciiz "\n"
+	msg1:       .asciiz "\t"
+	buscaRA:    .asciiz "\n Insira o RA do aluno em questao: "
+	tabela:     .asciiz " RAs\tMedia\tP1\tP2\tAT1\tAT2\tAT3\tAT4\tAT5"
+    passou:     .asciiz "\n RA aprovado: "
+    msgproj:    .asciiz "\n Notas projeto "
+    msgativ:    .asciiz "\n Notas atividade "
+    erro:       .asciiz "\n Introduza um valor valido: "
+	erroRA:     .asciiz "\n RA incorreto, insira um cadastrado no sistema: "
+	avs:        .asciiz "\n Qual avaliacao deseja alterar?\n 1 - Projeto 1.\n 2 - Projeto 2.\n 3 - Atividade 1.\n 4 - Atividade 2.\n 5 - Atividade 3.\n 6 - Atividade 4.\n 7 - Atividade 5.\n-> "
+	alteracao:  .asciiz "\n Insira a nota: "
+	#testar:    .asciiz "\nTESTE"
+    vetorRA:    .word 0, 0, 0, 0, 0
+    sizevetRA:  .byte 20
+    matriz:     .float 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+    #sizemat:   .word 160
+	mediasala:  .float 0
+    const10:    .float 10.0
+    const2:     .float 2.0
+	const5:     .float 5.0
+    const05:    .float 0.5
+	const20:    .float 20.0
+	const025:   .float 0.25
+	const0:     .float 0.0
+################################################################################
 .text
 .globl main
 main:
-    
     jal RegRA                       # Coletar RAs
 
     #jal Exibir						# Exibe o vetor TESTE
@@ -48,7 +45,7 @@ main:
     la $a0, RAsord
     syscall
 
-    jal Exibir						# Exibe o vetor TESTE
+    jal Exibir						# Exibe a ordem dos RAs que serão coletados
 
     loopmenu:
         li $v0, 4					# Imprime a mensagem de menu
@@ -68,19 +65,19 @@ main:
 
     cadastronota:
         jal Cadastrar				# Chama a função que cadastra as notas
-									# Reinicializar os índices da matriz---------------------------------
+
 		move $s1, $zero				# Zera o índice i
 		calc:
 			beq $s1, 160, retmenu	# Verifica se saiu da matriz
-			jal Calcular 			# Calcular precisa considerar medias de 0,5 em 0,5 e esta função só calcula a med de 1 aluno
+			jal Calcular 			# Calcular precisa considerar medias de 0,5 em 0,5 e esta função só calcula a média de 1 aluno
 			addi $s1, $s1, 32		# Atualiza o valor da linha
 			j calc
 		retmenu:
-        j loopmenu
+            j loopmenu
 
     altnota:
         jal Alterar					# Chama a função que altera uma nota
-        jal Calcular 				# Calcular precisa considerar medias de 0,5 em 0,5 e esta função só calcula a med de 1 aluno
+        jal Calcular 				# Calcular precisa considerar medias de 0,5 em 0,5 e esta função só calcula a média de 1 aluno
 									# Na alteração de nota há a recalculação da média do aluno
         j loopmenu
 
@@ -101,7 +98,7 @@ main:
         li $v0, 10                  # Encerra o programa
         syscall
 
-#----------------------------------------------------------------------
+################################################################################
 # Função que coleta os RAs
 RegRA:
     addi $sp, $sp, -4               # Empilha o registrador de retorno
@@ -116,7 +113,7 @@ RegRA:
 
         addi $a0, $t0, 1            # Adiciona 1 ao contador para correta exibição do RA para o usuário
         li $v0, 1
-        #move $a0, $t1
+
         syscall
 
         li $v0, 4                   # Acaba de imprimir a impressão da mensagem               
@@ -136,7 +133,7 @@ RegRA:
         addi $sp, $sp, 4
         jr $ra
 
-#--------------------------------------------------------------------
+################################################################################
 # Função teste para exibir os RAs TESTE
 Exibir:	
     addi $sp, $sp, -4
@@ -145,23 +142,22 @@ Exibir:
     move $t0, $zero                 # Zera o contador
 
     exibir:
-	li $v0, 4
-	la $a0, space				    # Exibe um espaço para separação dos números
-	syscall
-	
-	li $v0, 1					    # Comando para exibir o valor
-	lw $a0, vetorRA($t0)		    # Carrega o valor para exibir
-	syscall
-	
-	addi $t0, $t0, 4                # Adiciona 4 ao contador para correta manipulação do vetor
-	bne $t0, 20, exibir		        # Verifica se chegou ao final do array
-	
-	lw $ra, 0($sp)				    # Retira da pilha o endereço que foi chamada a main
-	addi $sp, $sp, 4
-	
-	jr $ra
+        li $v0, 4
+        la $a0, space				    # Exibe um espaço para separação dos números
+        syscall
+        
+        li $v0, 1					    # Comando para exibir o valor
+        lw $a0, vetorRA($t0)		    # Carrega o valor para exibir
+        syscall
+        
+        addi $t0, $t0, 4                # Adiciona 4 ao contador para correta manipulação do vetor
+        bne $t0, 20, exibir		        # Verifica se chegou ao final do array
+        
+        lw $ra, 0($sp)				    # Retira da pilha o endereço que foi chamada a main
+        addi $sp, $sp, 4
+        jr $ra
 
-#--------------------------------------------------------------------
+################################################################################
 # Função que cadastra as notas
 Cadastrar:
     addi $sp, $sp, -4               # Empilha o registrador de retorno
@@ -215,8 +211,8 @@ Cadastrar:
             jal Pularlinha
 
         Ler1:
-            add $t1, $s2, $s1 		# i+j
-            add $t1, $t1, $a1       # i+j+base
+            add $t1, $s2, $s1 		# i + j
+            add $t1, $t1, $a1       # i + j + base
             
             li $v0, 6               # Lê float da tela e guarda em f0
             syscall
@@ -230,21 +226,20 @@ Cadastrar:
 
             jal Pularlinha
 
-            addi $s1, $s1, 4        # Índice j+=4
+            addi $s1, $s1, 4        # Índice j += 4
     
             blt $s1, 32, Le
 
-    lw $ra, 0($sp)                  # Desempilha o registrador de retorno
-    addi $sp, $sp, 4
-    jr $ra
+        lw $ra, 0($sp)              # Desempilha o registrador de retorno
+        addi $sp, $sp, 4
+        jr $ra
 
-#------------------------------------------------------------------------------------
-# Função que altera uma nota de um aluno #####################
+################################################################################
+# Função que altera uma nota de um aluno
 Alterar:
     addi $sp, $sp, -4               # Empilha o registrador de retorno
     sw $ra, 0($sp)
 
-    # Coletar RA (verificar se existe), a prova (1-7, verificar se está no intervalo) e a nota a ser alterada (verificar se está no intervalo 0-10)
 	li $v0, 4						# Imprime a mensagem para coletar o RA
 	la $a0, buscaRA
 	syscall
@@ -259,7 +254,7 @@ Alterar:
 		li $v0, 5					# Coleta a opção do usuário
 		syscall
 
-		blt $v0, $zero, menunota
+		blt $v0, $zero, menunota    # Verifica se a opção do usuário está no intervalo correto
 		bgt $v0, 7, menunota
 
 		sll $s2, $v0, 2				# Multiplica por 4 para chegar na coluna correta
@@ -279,10 +274,10 @@ Alterar:
 		add $t1, $t1, $s2			# Soma com a coluna para chegar na correta posição na matriz
 		s.s $f0, 0($t1)				# Alteração do valor na matriz
     
-    lw $ra, 0($sp)                  # Desempilha o registrador de retorno
-    addi $sp, $sp, 4
-    jr $ra
-#------------------------------------------------------------------------------------
+        lw $ra, 0($sp)              # Desempilha o registrador de retorno
+        addi $sp, $sp, 4
+        jr $ra
+################################################################################
 # Função que coleta e verifica se o RA existe
 BuscarRA:
 	addi $sp, $sp, -4               # Empilha o registrador de retorno
@@ -303,10 +298,10 @@ BuscarRA:
 		move $t0, $zero				# Índice do vetor
 
 	percorre:
-		beq $t0, 20, novamente		# Verifica se chegou no final do vetor
+		beq $t0, 5, novamente		# Verifica se chegou no final do vetor
 
-		sll $t2, $t0, 2				# Multiplica por 4 para chegar na posição correta do vetor
-		add $t1, $t2, $a1			# Chega na posição correta do vetor na memória
+		sll $t1, $t0, 2				# Multiplica por 4 para chegar na posição correta do vetor
+		add $t1, $t1, $a1			# Chega na posição correta do vetor na memória
 	
 		lw $t2, 0($t1)				# Coleta o valor do RA
 
@@ -316,17 +311,16 @@ BuscarRA:
 		j percorre
 
 	found:
-		#li $v0, 4					# Imprime a mensagem de erro + inserir um novo RA
+		#li $v0, 4					# String de teste para encontrar o erro
 		#la $a0, testar
 		#syscall
-		mul $s1, $t1, 32			# Multiplica por 32 para chegar na linha correta da matriz
-		#TESTAR:
-		#sll $s1, $t1, 5
 
+		mul $s1, $t0, 32			# Multiplica por 32 para chegar na linha correta da matriz
 
 	lw $ra, 0($sp)                  # Desempilha o registrador de retorno
     addi $sp, $sp, 4
     jr $ra
+################################################################################
 # Função que exibe todas as notas dos alunos cadastrados 
 Exibnotas:
 	addi $sp, $sp, -4				# Empilha o endereço de retorno da main
@@ -360,7 +354,6 @@ Exibnotas:
         la $a0, msg1
         syscall
 
-		#### IMPRIMIR AS NOTAS E DPS A MÉDIA
 	printnota:
 		add $t2, $s1, $s2			# i + j
         add $t2, $a1, $t2     		# Atualiza para chegar na posição correta da memória
@@ -393,7 +386,7 @@ Exibnotas:
         addi $sp, $sp, 4
         jr $ra
 
-#------------------------------------------------------------------------------------
+################################################################################
 # Função que exibe a média aritmética das médias dos alunos
 Exibirmed:
 	addi, $sp, $sp, -4				# Empilha o endereço de retorno para a main
@@ -413,7 +406,7 @@ Exibirmed:
 	addi $sp, $sp, 4
 	jr $ra
     
-#-------------------------------------------------------------------------------------
+################################################################################
 # Função que exibe os alunos aprovados 
 ExibAprov:
     addi $sp, $sp, -4               # Empilha o registrador de retorno
@@ -451,12 +444,12 @@ ExibAprov:
         j verRA
 
     retornar:
-    jal Pularlinha
+        jal Pularlinha
 
     lw $ra, 0($sp)                  # Desempilha o registrador de retorno
     addi $sp, $sp, 4
     jr $ra
-#-------------------------------------------------------------------------------------
+################################################################################
 # Função auxiliar para troca de valores entre duas variáveis
 Swap:
 	addi $t4, $s1, 4			    # Carrega j+1
@@ -467,7 +460,7 @@ Swap:
 	sw $t1, vetorRA($t4)			# Array[j+1] = array[j]
 	jr $ra						    # Retorna para o loop
 
-#--------------------------------------------------------------------
+################################################################################
 # Função que ordena o vetor de RAs
 Sort:
 	addi $sp, $sp, -4			    # Armazena na pilha o endereço de retorno
@@ -505,16 +498,16 @@ Sort:
         addi $sp, $sp, 4
         
         jr $ra
-#-------------------------------------------------------------------------------------
+################################################################################
 # Função que calcula a média de um aluno
 Calcular:
     addi $sp, $sp, -4               # Empilha o registrador de retorno
     sw $ra, 0($sp)
 
-	l.s $f4, const5					# lwc1 $f4, const05			
-	l.s $f5, const2					# lwc1 $f5, const02
-	l.s $f6, const20				# lwc1 $f6, const20			
-	l.s $f7, const025 				# lwc1 $f7, const025
+	l.s $f4, const5					# Carrega 5 (lwc1 $f4, const05)		
+	l.s $f5, const2					# Carrega 2 (lwc1 $f5, const02)
+	l.s $f6, const20				# Carrega 20 (=lwc1 $f6, const20)
+	l.s $f7, const025 				# Carrega 0,25 (=lwc1 $f7, const025)
     l.s $f2, const0					# Zerando o registrador que guardará a média
 
 	addi $s3, $s1, 32				# s3 guardará o final de cada linha da matriz
@@ -559,12 +552,7 @@ Calcular:
 
         jal Aproxima
 
-        mov.s $f2, $f9
-
-        
-        #mov.s $f12,$f2
-        #li $v0, 2   #---lembrar de fazer teste para ver se pega certo
-        #syscall
+        mov.s $f2, $f9              # Move a média para outro registrador para salvar
 
         addi $s3, $s3, -32			# Subtrai o índice da linha para chegar na posição da média
         add $t1, $s3, $a1			# Soma o endereço para chegar a posição correta na memória
@@ -574,7 +562,7 @@ Calcular:
 	addi $sp, $sp, 4
 	jr $ra
 
-#-------------------------------------------------------------------------------------
+################################################################################
 # Função que calcula a média da sala
 Medsala:
     addi $sp, $sp, -4               # Empilha o registrador de retorno
@@ -582,7 +570,7 @@ Medsala:
 
     move $s2, $zero                 # Zera o registrador que manipula a matriz
     la $a1, matriz  				# Endereço da matriz  de notas na memória
-	l.s $f8, const0                 #
+	l.s $f8, const0                 # Carrega 0
 
     somamed:
 		add $t0, $a1, $s2     		# Atualiza para chegar na posição correta da memória
@@ -610,15 +598,15 @@ Medsala:
     	addi $sp, $sp, 4
     	jr $ra
 
-#-------------------------------------------------------------------------------------
+################################################################################
 # Função que faz o arredondamento da média
 Aproxima:
     addi $sp, $sp, -4               # Empilha o registrador de retorno
     sw $ra, 0($sp)
 
-    l.s $f4, const05				#lwc1 $f4, const05			
+    l.s $f4, const05				# lwc1 $f4, const05			
     l.s $f9, const0                 # Zera a variável que percorrerá o loop
-    l.s $f7, const025 				#lwc1 $f7, const025
+    l.s $f7, const025 				# lwc1 $f7, const025
 
     chegamedia:
         c.lt.s $f9, $f2             # Verifica se a variável do loop ultrapassou a média
@@ -640,10 +628,10 @@ Aproxima:
     parabaixo:                  
         sub.s $f9, $f9, $f7         # Arredonda a média para baixo
     guardar:
-    lw $ra, 0($sp)                  # Desempilha o registrador de retorno
-    addi $sp, $sp, 4
-    jr $ra
-#-------------------------------------------------------------------------------------
+        lw $ra, 0($sp)              # Desempilha o registrador de retorno
+        addi $sp, $sp, 4
+        jr $ra
+################################################################################
 # Função que imprime uma nova linha
 Pularlinha:
 	addi $sp, $sp, -4               # Empilha o registrador de retorno
@@ -653,10 +641,10 @@ Pularlinha:
     la $a0, msg
     syscall
     
-    lw $ra, 0($sp)                  # desempilha o registrador de retorno
+    lw $ra, 0($sp)                  # Desempilha o registrador de retorno
     addi $sp, $sp, 4
     jr $ra
-#-------------------------------------------------------------------------------------
+################################################################################
 # Função que verifica se a nota está entre 0 a 10
 Verintervalo:
     addi $sp, $sp, -4               # Empilha o registrador de retorno
@@ -685,17 +673,17 @@ Verintervalo:
             j conf
 
     certo:
-    lw $ra, 0($sp)                  # Desempilha o registrador de retorno
-    addi $sp, $sp, 4
-    jr $ra
+        lw $ra, 0($sp)              # Desempilha o registrador de retorno
+        addi $sp, $sp, 4
+        jr $ra
 
 ######################################################################################
-# RASCUNHO
-    addi $sp, $sp, -4               # Empilha o registrador de retorno
-    sw $ra, 0($sp)
+# RASCUNHO para as funções (empilha e desempilha)
+    #addi $sp, $sp, -4               # Empilha o registrador de retorno
+    #sw $ra, 0($sp)
 
     
-    lw $ra, 0($sp)                  # Desempilha o registrador de retorno
-    addi $sp, $sp, 4
-    jr $ra
+    #lw $ra, 0($sp)                  # Desempilha o registrador de retorno
+    #addi $sp, $sp, 4
+    #jr $ra
 
