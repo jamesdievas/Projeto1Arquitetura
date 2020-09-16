@@ -3,7 +3,7 @@
 .data
     RAs:        .asciiz "\n Insira o RA do aluno "
     pontos:     .asciiz ": "
-    menu:       .asciiz "\n 0 - Encerrar programa.\n1 - Cadastrar notas.\n2 - Alterar nota.\n3 - Exibir notas.\n4 - Media aritmetica da turma.\n5 - Aprovados.\n-> "
+    menu:       .asciiz "\n0 - Encerrar programa.\n1 - Cadastrar notas.\n2 - Alterar nota.\n3 - Exibir notas.\n4 - Media aritmetica da turma.\n5 - Aprovados.\n-> "
 	msgmedsala: .asciiz "\n Media da sala: "
     RAsord:     .asciiz "\n RAs ordenados:\n"
     space:      .asciiz " "
@@ -41,7 +41,7 @@ main:
 
     jal Sort	                    # Ordena o vetor de RA's
 
-    li $v0, 4
+    li $v0, 4						# Imprime a string de "RAs ordenados"
     la $a0, RAsord
     syscall
 
@@ -162,6 +162,12 @@ Exibir:
 Cadastrar:
     addi $sp, $sp, -4               # Empilha o registrador de retorno
     sw $ra, 0($sp)
+
+	li $v0, 4						# Imprime a string de "RAs ordenados"
+    la $a0, RAsord
+    syscall
+
+    jal Exibir						# Exibe a ordem dos RAs que serão coletados
 
     la $a1, matriz					# Coleta o endereço base da matriz  
     addi $s1, $zero, 4              # Inicializa o j=4
