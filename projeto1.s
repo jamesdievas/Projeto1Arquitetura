@@ -93,7 +93,7 @@ main:
     aprovados:
         jal ExibAprov				# Chama a função que exibe os aprovados
         j loopmenu
-    
+
     fim:
         li $v0, 10                  # Encerra o programa
         syscall
@@ -116,7 +116,7 @@ RegRA:
 
         syscall
 
-        li $v0, 4                   # Acaba de imprimir a impressão da mensagem               
+        li $v0, 4                   # Acaba de imprimir a impressão da mensagem
         la $a0, pontos
         syscall
 
@@ -135,7 +135,7 @@ RegRA:
 
 ################################################################################
 # Função teste para exibir os RAs TESTE
-Exibir:	
+Exibir:
     addi $sp, $sp, -4
     sw $ra, 0($sp)
 
@@ -145,14 +145,14 @@ Exibir:
         li $v0, 4
         la $a0, space				    # Exibe um espaço para separação dos números
         syscall
-        
+
         li $v0, 1					    # Comando para exibir o valor
         lw $a0, vetorRA($t0)		    # Carrega o valor para exibir
         syscall
-        
+
         addi $t0, $t0, 4                # Adiciona 4 ao contador para correta manipulação do vetor
         bne $t0, 20, exibir		        # Verifica se chegou ao final do array
-        
+
         lw $ra, 0($sp)				    # Retira da pilha o endereço que foi chamada a main
         addi $sp, $sp, 4
         jr $ra
@@ -169,7 +169,7 @@ Cadastrar:
 
     jal Exibir						# Exibe a ordem dos RAs que serão coletados
 
-    la $a1, matriz					# Coleta o endereço base da matriz  
+    la $a1, matriz					# Coleta o endereço base da matriz
     addi $s1, $zero, 4              # Inicializa o j=4
 
     Le:
@@ -219,7 +219,7 @@ Cadastrar:
         Ler1:
             add $t1, $s2, $s1 		# i + j
             add $t1, $t1, $a1       # i + j + base
-            
+
             li $v0, 6               # Lê float da tela e guarda em f0
             syscall
 
@@ -233,7 +233,7 @@ Cadastrar:
             jal Pularlinha
 
             addi $s1, $s1, 4        # Índice j += 4
-    
+
             blt $s1, 32, Le
 
         lw $ra, 0($sp)              # Desempilha o registrador de retorno
@@ -276,10 +276,10 @@ Alterar:
 
 		la $a2, matriz				# Carrega o endereço da matriz
 
-		add $t1, $a2, $s1			# Soma a linha ao endereço 
+		add $t1, $a2, $s1			# Soma a linha ao endereço
 		add $t1, $t1, $s2			# Soma com a coluna para chegar na correta posição na matriz
 		s.s $f0, 0($t1)				# Alteração do valor na matriz
-    
+
         lw $ra, 0($sp)              # Desempilha o registrador de retorno
         addi $sp, $sp, 4
         jr $ra
@@ -308,7 +308,7 @@ BuscarRA:
 
 		sll $t1, $t0, 2				# Multiplica por 4 para chegar na posição correta do vetor
 		add $t1, $t1, $a1			# Chega na posição correta do vetor na memória
-	
+
 		lw $t2, 0($t1)				# Coleta o valor do RA
 
 		beq	$v0, $t2, found			# Verifica se o RA existe
@@ -327,7 +327,7 @@ BuscarRA:
     addi $sp, $sp, 4
     jr $ra
 ################################################################################
-# Função que exibe todas as notas dos alunos cadastrados 
+# Função que exibe todas as notas dos alunos cadastrados
 Exibnotas:
 	addi $sp, $sp, -4				# Empilha o endereço de retorno da main
 	sw $ra, 0($sp)
@@ -378,7 +378,7 @@ Exibnotas:
 
 	novalinha:
 
-		jal Pularlinha				
+		jal Pularlinha
 
         addi $s0, $s0, 4    		# Atualiza o valor da posição no vetor
 		li $s2, 0					# Zera j para começar na primeira coluna
@@ -411,9 +411,9 @@ Exibirmed:
 	lw $ra, 0($sp)					# Desempilha o endereço de retorno para a main
 	addi $sp, $sp, 4
 	jr $ra
-    
+
 ################################################################################
-# Função que exibe os alunos aprovados 
+# Função que exibe os alunos aprovados
 ExibAprov:
     addi $sp, $sp, -4               # Empilha o registrador de retorno
     sw $ra, 0($sp)
@@ -432,10 +432,10 @@ ExibAprov:
 
         c.lt.s $f0, $f1             # Verifica se o aluno reprovou
         bc1t continuar
-        
+
         add $t2, $t0, $a1           # Soma o endereço do vetor mais a posição
         lw $v1, 0($t2)              # Carrega o RA do aluno
-        
+
         li $v0, 4
         la $a0, passou              # Exibe a string de aprovação
         syscall
@@ -443,7 +443,7 @@ ExibAprov:
         li $v0, 1
         move $a0, $v1               # Exibe o RA do aluno aprovado
         syscall
-        
+
     continuar:
         addi $t0, $t0, 4            # Atualiza a posição do vetor
         addi $t1, $t1, 32           # Atualiza a linha da matriz
@@ -471,19 +471,19 @@ Swap:
 Sort:
 	addi $sp, $sp, -4			    # Armazena na pilha o endereço de retorno
 	sw $ra, 0($sp)
-	
+
 	lb $s0, sizevetRA				# i = size
-	
+
     loop1:
         blt $s0, 1, exit1			# Verifica se i < 1
         move $s1, $zero				# j = 0
-        
+
     loop2:
         slt $t0, $s1, $s0			# Verifica se j < i
-        beq $t0, $zero, exit2	
+        beq $t0, $zero, exit2
 
         addi $t5, $s1, 4			# Avança 1 posição no vetor para acessá-lo
-        
+
         lw $t3, vetorRA($s1)		# $t3 recebe array[j]
         lw $t4, vetorRA($t5)		# $t4 recebe array[j+1]
 
@@ -491,18 +491,18 @@ Sort:
 
         jal Swap
 
-    continua:	
+    continua:
         addi $s1, $s1, 4			# Incrementa uma posição em j (4 bytes = 1 word)
         j loop2
-        
+
     exit2:
         addi $s0, $s0, -4			# Decrementa uma posição do i, (4 bytes = 1 word)
         j loop1
-        
+
     exit1:
         lw $ra, 0($sp)				# Retira da pilha o endereço de retorno
         addi $sp, $sp, 4
-        
+
         jr $ra
 ################################################################################
 # Função que calcula a média de um aluno
@@ -510,7 +510,7 @@ Calcular:
     addi $sp, $sp, -4               # Empilha o registrador de retorno
     sw $ra, 0($sp)
 
-	l.s $f4, const5					# Carrega 5 (lwc1 $f4, const05)		
+	l.s $f4, const5					# Carrega 5 (lwc1 $f4, const05)
 	l.s $f5, const2					# Carrega 2 (lwc1 $f5, const02)
 	l.s $f6, const20				# Carrega 20 (=lwc1 $f6, const20)
 	l.s $f7, const025 				# Carrega 0,25 (=lwc1 $f7, const025)
@@ -539,12 +539,12 @@ Calcular:
 
 	addi $s2, $s2, 4				# Move J para o próximo elemento (primeira atividade)
 	# Peso 5 para os projetos
-	ativs:	
+	ativs:
 		beq $s2, $s3, fimAtiv		# Compara se chegou ao final da linha
 
 		add $t1, $s2, $a1			# Adiciona o valor do endereço da matriz
 		l.s $f1, 0($t1)				# Acessa o valor na matriz
-		
+
 		mul.s $f3, $f1, $f5			# Multiplica a nota pelo seu respectivo peso
 
 		add.s $f2, $f2, $f3			# Media += Ax (x = nº da atividade)
@@ -610,7 +610,7 @@ Aproxima:
     addi $sp, $sp, -4               # Empilha o registrador de retorno
     sw $ra, 0($sp)
 
-    l.s $f4, const05				# lwc1 $f4, const05			
+    l.s $f4, const05				# lwc1 $f4, const05
     l.s $f9, const0                 # Zera a variável que percorrerá o loop
     l.s $f7, const025 				# lwc1 $f7, const025
 
@@ -618,11 +618,11 @@ Aproxima:
         c.lt.s $f9, $f2             # Verifica se a variável do loop ultrapassou a média
         bc1f remainder              # Se ultrapassou vai para o arredondamento
 
-        add.s $f9, $f9, $f4         # Senão incrementa 0,5 
+        add.s $f9, $f9, $f4         # Senão incrementa 0,5
 
         j chegamedia
 
-    remainder:                      
+    remainder:
         sub.s $f9, $f9, $f7         # Decrementa 0,25
 
         c.lt.s $f2, $f9             # Compara se a média arrendondará para cima ou para baixo
@@ -631,7 +631,7 @@ Aproxima:
         add.s $f9, $f9, $f7         # Arredonda a média para cima
         j guardar
 
-    parabaixo:                  
+    parabaixo:
         sub.s $f9, $f9, $f7         # Arredonda a média para baixo
     guardar:
         lw $ra, 0($sp)              # Desempilha o registrador de retorno
@@ -646,7 +646,7 @@ Pularlinha:
 	li $v0, 4            			# Imprime nova linha
     la $a0, msg
     syscall
-    
+
     lw $ra, 0($sp)                  # Desempilha o registrador de retorno
     addi $sp, $sp, 4
     jr $ra
@@ -656,7 +656,7 @@ Verintervalo:
     addi $sp, $sp, -4               # Empilha o registrador de retorno
     sw $ra, 0($sp)
 
-    l.s $f5, const0                 # Carrega 0 
+    l.s $f5, const0                 # Carrega 0
     l.s $f6, const10                # Carrega 10
 
     conf:
@@ -688,7 +688,7 @@ Verintervalo:
     #addi $sp, $sp, -4               # Empilha o registrador de retorno
     #sw $ra, 0($sp)
 
-    
+
     #lw $ra, 0($sp)                  # Desempilha o registrador de retorno
     #addi $sp, $sp, 4
     #jr $ra
