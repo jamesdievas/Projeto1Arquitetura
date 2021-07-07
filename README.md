@@ -1,4 +1,6 @@
 # Cálculo de média
+![GitHub Repository Size](https://img.shields.io/github/repo-size/h-ssiqueira/Projeto1Arquitetura?label=Repository%20Size&style=for-the-badge)
+
 ![VS Code](https://img.shields.io/badge/Visual_Studio_Code-0078D4?style=for-the-badge&logo=visual%20studio%20code&logoColor=white)
 
 ## Descrição do projeto
